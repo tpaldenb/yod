@@ -5,19 +5,135 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vibeathon Gate Entry</title>
 <style>
-  body { font-family: Arial; text-align: center; margin-top: 30px; background:#f0f0f0;}
-  video { border: 3px solid #333; margin: 10px; border-radius: 5px; }
-  button { padding: 12px 25px; margin: 10px; cursor: pointer; border:none; border-radius:5px; background:#4caf50; color:white; font-size:16px; }
-  button:hover { background:#45a049; }
-  #scanProgress { width: 300px; height: 20px; border:2px solid #333; border-radius:5px; margin:20px auto; display:none; background:#ccc; overflow:hidden; }
-  #scanBar { height:100%; width:0%; background:#4caf50; transition: width 0.2s; }
-  #faceResult { font-weight:bold; margin-top:10px; font-size:18px; }
+  body {
+    font-family: 'Orbitron', Arial, sans-serif;
+    text-align: center;
+    margin-top: 30px;
+    background: radial-gradient(ellipse at top left, #1a1a2e 60%, #0f3460 100%);
+    color: #fff;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  .stars {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0; left: 0;
+    z-index: -1;
+    background: transparent;
+    pointer-events: none;
+  }
+  .planet {
+    position: absolute;
+    left: 10vw;
+    top: 10vh;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle at 40% 40%, #f9d423 60%, #ff4e50 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 60px 20px #f9d42355;
+    z-index: 0;
+    animation: planetMove 8s infinite alternate ease-in-out;
+  }
+  @keyframes planetMove {
+    0% { left: 10vw; top: 10vh; }
+    100% { left: 80vw; top: 20vh; }
+  }
+  video {
+    border: 3px solid #fff;
+    margin: 10px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px #00d2d3;
+    background: #222;
+  }
+  button {
+    padding: 14px 32px;
+    margin: 10px;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #00d2d3 0%, #1a1a2e 100%);
+    color: #fff;
+    font-size: 18px;
+    font-family: 'Orbitron', Arial, sans-serif;
+    letter-spacing: 2px;
+    box-shadow: 0 0 10px #00d2d3;
+    transition: background 0.3s, transform 0.2s;
+  }
+  button:hover {
+    background: linear-gradient(90deg, #ff4e50 0%, #f9d423 100%);
+    transform: scale(1.07);
+  }
+  #scanProgress {
+    width: 320px;
+    height: 22px;
+    border: 2px solid #fff;
+    border-radius: 8px;
+    margin: 24px auto;
+    display: none;
+    background: #222;
+    overflow: hidden;
+    box-shadow: 0 0 10px #00d2d3;
+  }
+  #scanBar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #f9d423 0%, #ff4e50 100%);
+    transition: width 0.2s;
+  }
+  #faceResult {
+    font-weight: bold;
+    margin-top: 16px;
+    font-size: 22px;
+    color: #f9d423;
+    text-shadow: 0 0 8px #ff4e50;
+  }
+  .game-section {
+    margin: 40px auto 0 auto;
+    padding: 24px 0;
+    max-width: 400px;
+    background: rgba(15,52,96,0.7);
+    border-radius: 16px;
+    box-shadow: 0 0 20px #00d2d3;
+  }
+  .game-title {
+    font-size: 28px;
+    color: #fff;
+    margin-bottom: 12px;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px #f9d423;
+  }
+  .game-score {
+    font-size: 20px;
+    color: #f9d423;
+    margin-bottom: 10px;
+  }
+  .game-btn {
+    background: linear-gradient(90deg, #00d2d3 0%, #1a1a2e 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-size: 16px;
+    margin: 8px;
+    box-shadow: 0 0 8px #00d2d3;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+  }
+  .game-btn:hover {
+    background: linear-gradient(90deg, #ff4e50 0%, #f9d423 100%);
+    transform: scale(1.07);
+  }
 </style>
+<link href="https://fonts.googleapis.com/css?family=Orbitron:700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-<h1>Vibeathon Gate Entry</h1>
-<p>Scan your face to enter the Vibeathon!</p>
+<div class="stars"></div>
+<div class="planet"></div>
+<h1 style="font-size:42px; color:#fff; letter-spacing:3px; text-shadow:0 0 20px #f9d423; margin-bottom:10px;">Vibeathon Gate Entry</h1>
+<p style="font-size:20px; color:#f9d423; margin-bottom:30px; text-shadow:0 0 8px #ff4e50;">Scan your face to enter the Vibeathon!</p>
+
 
 <video id="video" width="320" height="240" autoplay muted></video><br>
 <button id="verifyBtn">Start Scan</button>
@@ -25,12 +141,39 @@
 <div id="scanProgress"><div id="scanBar"></div></div>
 <p id="faceResult"></p>
 
+<!-- Space Game Section -->
+<div class="game-section" id="gameSection">
+  <div class="game-title">Space Clicker Game 🚀</div>
+  <div class="game-score" id="gameScore">Score: 0</div>
+  <button class="game-btn" id="gameBtn">Click the Meteor!</button>
+  <div id="gameMsg" style="margin-top:10px; color:#fff;"></div>
+</div>
+
 <script>
 const video = document.getElementById("video");
 const faceResult = document.getElementById("faceResult");
 const verifyBtn = document.getElementById("verifyBtn");
 const scanProgress = document.getElementById("scanProgress");
 const scanBar = document.getElementById("scanBar");
+
+// Space background stars
+function createStars() {
+  const starsDiv = document.querySelector('.stars');
+  for(let i=0;i<120;i++){
+    const star = document.createElement('div');
+    star.style.position = 'absolute';
+    star.style.width = '2px';
+    star.style.height = '2px';
+    star.style.borderRadius = '50%';
+    star.style.background = '#fff';
+    star.style.top = Math.random()*100+'vh';
+    star.style.left = Math.random()*100+'vw';
+    star.style.opacity = Math.random()*0.8+0.2;
+    star.style.boxShadow = `0 0 ${Math.random()*8+2}px #fff`;
+    starsDiv.appendChild(star);
+  }
+}
+createStars();
 
 navigator.mediaDevices.getUserMedia({ video: true })
   .then(stream => video.srcObject = stream)
@@ -92,6 +235,32 @@ verifyBtn.addEventListener("click", ()=>{
     }
   },100);
 });
+
+// Space Clicker Game
+let score = 0;
+const gameBtn = document.getElementById('gameBtn');
+const gameScore = document.getElementById('gameScore');
+const gameMsg = document.getElementById('gameMsg');
+let meteorTimeout;
+
+function randomMeteor(){
+  gameBtn.style.position = 'absolute';
+  gameBtn.style.left = Math.random()*60+20+'vw';
+  gameBtn.style.top = Math.random()*30+60+'vh';
+  gameBtn.innerHTML = '☄️ Meteor!';
+}
+
+gameBtn.addEventListener('click', ()=>{
+  score++;
+  gameScore.innerText = 'Score: '+score;
+  gameMsg.innerText = score >= 10 ? '🌟 You are a Space Ace! 🌟' : '';
+  clearTimeout(meteorTimeout);
+  meteorTimeout = setTimeout(randomMeteor, 600);
+  randomMeteor();
+});
+
+// Initial meteor position
+randomMeteor();
 </script>
 </body>
 </html>
