@@ -309,6 +309,13 @@ function sendMessage(){
 
   setTimeout(()=> addBotMessage(response), 400);
 }
+
+// Allow Enter key to send message
+document.getElementById('userInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    sendMessage();
+  }
+});
 </script>
 </body>
 </html>
