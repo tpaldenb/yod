@@ -295,13 +295,19 @@ function sendMessage(){
   chatBox.scrollTop = chatBox.scrollHeight;
   input.value = "";
 
+  let msg = userMsg.toLowerCase();
   let response = "Sorry, I didn't understand that. Ask about badges, events, or directions.";
 
-  if(userMsg.toLowerCase().includes("badge")) response = `You have earned ${badges.length} badge(s).`;
-  if(userMsg.toLowerCase().includes("directions")) response = "Click an event button and then click checkpoints on the map to earn badges!";
-  if(userMsg.toLowerCase().includes("events")) response = "Available events: Music Battle, Dance Show, Coding Challenge, Quiz Competition, Sports Arena.";
+  if(msg.includes("hello") || msg.includes("hi")) response = "Hello! Welcome to Vibeathon. How can I help you today?";
+  else if(msg.includes("badge")) response = `You have earned ${badges.length} badge(s).`;
+  else if(msg.includes("directions")) response = "Click an event button and then click checkpoints on the map to earn badges!";
+  else if(msg.includes("events") || msg.includes("event")) response = "Available events: Music Battle, Dance Show, Coding Challenge, Quiz Competition, Sports Arena.";
+  else if(msg.includes("date")) response = `Today's date is ${new Date().toLocaleDateString()}.`;
+  else if(msg.includes("time")) response = `Current time: ${new Date().toLocaleTimeString()}.`;
+  else if(msg.includes("joke")) response = "Why did the computer go to the dance? Because it had the right moves!";
+  else if(msg.includes("clear")) { chatBox.innerHTML = ""; return; }
 
-  setTimeout(()=> addBotMessage(response), 500);
+  setTimeout(()=> addBotMessage(response), 400);
 }
 </script>
 </body>
