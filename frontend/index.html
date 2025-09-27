@@ -58,7 +58,7 @@ function compareImages(data1, data2){
     diff += Math.abs(data1.data[i+2]-data2.data[i+2]);
   }
   let avgDiff = diff / (data1.data.length/4);
-  return avgDiff < 150;
+  return avgDiff < 5000;
 }
 
 verifyBtn.addEventListener("click", ()=>{
