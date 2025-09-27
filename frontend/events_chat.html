@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vibeathon Interactive Gaming</title>
+<style>
+  body { font-family: Arial; text-align: center; margin: 20px; background:#f0f0f0; }
+  h1, h3 { margin: 10px; }
+  button { padding: 12px 25px; margin: 10px; cursor: pointer; border:none; border-radius:5px; background:#2196f3; color:white; font-size:16px; }
+  button:hover { background:#1976d2; }
+
+  /* Badge styles */
+  #badgeBoard { margin-top: 20px; }
+  .badge { display:inline-block; background:#4caf50; color:white; padding:10px; margin:5px; border-radius:5px; }
+
+  /* Map / Checkpoints */
+  #map { margin: 20px auto; width: 80%; height: 400px; border:3px solid #00796b; border-radius:10px; position: relative; background:#a7ffeb; display:none; }
+  .checkpoint { width: 40px; height: 40px; background: #ff5722; border-radius: 50%; position: absolute; display:flex; justify-content:center; align-items:center; color:white; font-weight:bold; cursor:pointer; transition: transform 0.3s;}
+  .checkpoint:hover { transform: scale(1.2); }
+
+  /* Medal */
+  #medal { margin-top:20px; font-size:24px; color:#fbc02d; font-weight:bold; display:none; }
+
+  /* Chatbot */
+  #chatContainer { position: fixed; bottom: 20px; right: 20px; width: 300px; background:#fff; border:2px solid #333; border-radius:10px; padding:10px; box-shadow: 2px 2px 10px rgba(0,0,0,0.2);}
+  #chatBox { height: 200px; overflow-y: auto; border:1px solid #ccc; padding:5px; margin-bottom:5px; background:#f9f9f9; border-radius:5px; text-align:left;}
+  #userInput { width: calc(100% - 60px); padding:5px; }
+</style>
+</head>
+<body>
+
+<h1>Welcome to Vibeathon!</h1>
+<h3>Select an event to participate:</h3>
+
+<button onclick="selectEvent('Music Battle')">Music Battle</button>
+<button onclick="selectEvent('Dance Show')">Dance Show</button>
+<button onclick="selectEvent('Coding Challenge')">Coding Challenge</button>
+<button onclick="selectEvent('Quiz Competition')">Quiz Competition</button>
+<button onclick="selectEvent('Sports Arena')">Sports Arena</button>
+
+<div id="badgeBoard"><h3>Badges Earned:</h3></div>
+<div id="map"></div>
+<div id="medal">🏅 Congratulations! You earned the Medal! 🏅</div>
+
+<!-- Chatbot -->
+<div id="chatContainer">
+  <div id="chatBox"></div>
+  <input type="text" id="userInput" placeholder="Type your message..." />
+  <button onclick="sendMessage()">Send</button>
+</div>
+
+<script>
+const badgeBoard = document.getElementById("badgeBoard");
+const map = document.getElementById("map");
+const medalDiv = document.getElementById("medal");
+const chatBox = document.getElementById("chatBox");
+
+let badges = [];
+let checkpointsCreated = {};
+
+const eventsCheckpoints = {
+  "Music Battle": [{top:50,left:50},{top:150,left:200},{top:100,left:350}],
+  "Dance Show": [{top:60,left:60},{top:200,left:180},{top:150,left:300}],
+  "Coding Challenge": [{top:50,left:50},{top:150,left:200},{top:100,left:350}],
+  "Quiz Competition": [{top:70,left:70},{top:180,left:220},{top:130,left:370}],
+  "Sports Arena": [{top:50,left:50},{top:150,left:200},{top:100,left:350}]
+};
+
+// Event selection
+function selectEvent(eventName){
+  if(!badges.includes(eventName)){
+    badges.push(eventName);
+    const badge = document.createElement('div');
+    badge.className = 'badge';
+    badge.innerText = eventName + " Badge";
+    badgeBoard.appendChild(badge);
+    addBotMessage(`Congrats! You earned a badge for ${eventName}.`);
+  } else {
+    addBotMessage(`You already have the ${eventName} badge.`);
+  }
+
+  showMap(eventName);
+  checkMedal();
+}
+
+// Show map with checkpoints
+function showMap(eventName){
+  map.innerHTML = '';
+  map.style.display = 'block';
+  checkpointsCreated[eventName] = [];
+
+  eventsCheckpoints[eventName].forEach((pos,i)=>{
+    const cp = document.createElement('div');
+    cp.className = 'checkpoint';
+    cp.style.top = pos.top + 'px';
+    cp.style.left = pos.left + 'px';
+    cp.innerText = i+1;
+    cp.dataset.event = eventName;
+
+    cp.addEventListener('click', ()=>{
+      if(!checkpointsCreated[eventName].includes(i)){
+        checkpointsCreated[eventName].push(i);
+        addBotMessage(`Checkpoint ${i+1} completed for ${eventName}!`);
+      }
+      checkMedal();
+    });
+
+    map.appendChild(cp);
+  });
+}
+
+// Check if all badges/checkpoints done
+function checkMedal(){
+  const totalBadges = Object.keys(eventsCheckpoints).length;
+  const completedCheckpoints = Object.values(checkpointsCreated).reduce((sum, arr)=>sum + arr.length,0);
+  if(badges.length === totalBadges && completedCheckpoints >= totalBadges*3){
+    medalDiv.style.display = 'block';
+    addBotMessage("🎉 You earned the Vibeathon Medal! Congratulations!");
+  }
+}
+
+// Chatbot functions
+function addBotMessage(msg){
+  const p = document.createElement('p');
+  p.innerHTML = "<strong>Bot:</strong> " + msg;
+  chatBox.appendChild(p);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function sendMessage(){
+  const input = document.getElementById('userInput');
+  const userMsg = input.value.trim();
+  if(userMsg === "") return;
+
+  const p = document.createElement('p');
+  p.innerHTML = "<strong>You:</strong> " + userMsg;
+  chatBox.appendChild(p);
+  chatBox.scrollTop = chatBox.scrollHeight;
+
+  input.value = "";
+
+  let response = "Sorry, I didn't understand that. Ask about badges, events, or directions.";
+
+  if(userMsg.toLowerCase().includes("badge")) response = `You have earned ${badges.length} badge(s).`;
+  if(userMsg.toLowerCase().includes("directions")) response = "Click an event button and then click checkpoints on the map to earn badges!";
+  if(userMsg.toLowerCase().includes("events")) response = "Available events: Music Battle, Dance Show, Coding Challenge, Quiz Competition, Sports Arena.";
+
+  setTimeout(()=> addBotMessage(response), 500);
+}
+</script>
+
+</body>
+</html>

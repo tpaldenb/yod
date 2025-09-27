@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vibeathon Gate Entry</title>
+<style>
+  body { font-family: Arial; text-align: center; margin-top: 30px; background:#f0f0f0;}
+  video { border: 3px solid #333; margin: 10px; border-radius: 5px; }
+  button { padding: 12px 25px; margin: 10px; cursor: pointer; border:none; border-radius:5px; background:#4caf50; color:white; font-size:16px; }
+  button:hover { background:#45a049; }
+  #scanProgress { width: 300px; height: 20px; border:2px solid #333; border-radius:5px; margin:20px auto; display:none; background:#ccc; overflow:hidden; }
+  #scanBar { height:100%; width:0%; background:#4caf50; transition: width 0.2s; }
+  #faceResult { font-weight:bold; margin-top:10px; font-size:18px; }
+</style>
+</head>
+<body>
+
+<h1>Vibeathon Gate Entry</h1>
+<p>Scan your face to enter the Vibeathon!</p>
+
+<video id="video" width="320" height="240" autoplay muted></video><br>
+<button id="verifyBtn">Start Scan</button>
+
+<div id="scanProgress"><div id="scanBar"></div></div>
+<p id="faceResult"></p>
+
+<script>
+const video = document.getElementById("video");
+const faceResult = document.getElementById("faceResult");
+const verifyBtn = document.getElementById("verifyBtn");
+const scanProgress = document.getElementById("scanProgress");
+const scanBar = document.getElementById("scanBar");
+
+navigator.mediaDevices.getUserMedia({ video: true })
+  .then(stream => video.srcObject = stream)
+  .catch(err => console.error(err));
+
+const referenceImg = new Image();
+referenceImg.src = 'sap.jpg'; // reference image
+let referenceData = null;
+
+referenceImg.onload = () => {
+  const canvas = document.createElement("canvas");
+  canvas.width = 100; canvas.height = 100;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(referenceImg,0,0,100,100);
+  referenceData = ctx.getImageData(0,0,100,100);
+  faceResult.innerText = "Ready. Press 'Start Scan'.";
+};
+
+function compareImages(data1, data2){
+  if(!data1 || !data2) return false;
+  let diff=0;
+  for(let i=0;i<data1.data.length;i+=4){
+    diff += Math.abs(data1.data[i]-data2.data[i]);
+    diff += Math.abs(data1.data[i+1]-data2.data[i+1]);
+    diff += Math.abs(data1.data[i+2]-data2.data[i+2]);
+  }
+  let avgDiff = diff / (data1.data.length/4);
+  return avgDiff < 150;
+}
+
+verifyBtn.addEventListener("click", ()=>{
+  if(!referenceData){ faceResult.innerText="Reference image not loaded."; return; }
+
+  scanProgress.style.display = "block";
+  scanBar.style.width = "0%";
+  faceResult.innerText = "Scanning... Hold still!";
+
+  let progress = 0;
+  const scanInterval = setInterval(()=>{
+    progress += 5;
+    scanBar.style.width = progress + "%";
+
+    if(progress >= 100){
+      clearInterval(scanInterval);
+
+      const canvas = document.createElement("canvas");
+      canvas.width=100; canvas.height=100;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(video,0,0,100,100);
+      const webcamData = ctx.getImageData(0,0,100,100);
+
+      if(compareImages(referenceData, webcamData)){
+        faceResult.innerHTML = "🎉 Access Granted! Redirecting to Vibeathon...";
+        setTimeout(()=>{ window.location.href='events.html'; },1000);
+      } else {
+        faceResult.innerHTML = "❌ Access Denied! Face does not match. Try again.";
+        scanProgress.style.display = "none";
+      }
+    }
+  },100);
+});
+</script>
+</body>
+</html>
